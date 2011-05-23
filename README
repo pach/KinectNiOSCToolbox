@@ -1,0 +1,25 @@
+This software want's to be an easy access to different possibility of kinect threw OSC for non programmer people.
+Actually it still need to have an xcode or equivalent installed on your mac to compile and install openNI driver.
+This software is made in OpenFrameworks and mostly based on gameoverhack ofxOpenNI port https://github.com/gameoverhack/ofxOpenNI
+
+Need to have openNI, kinect driver and NITE algorithm installed on your computer.
+This software as only been tested on mac platform
+OpenNI : https://github.com/OpenNI/OpenNI/tree/unstable
+driver : https://github.com/avin2/SensorKinect
+Nite : http://www.openni.org/downloadfiles/12-openni-compliant-middleware-binaries
+
+Already done :
+- track multiple users into space and send their position in world coordinates threw OSC
+- there is different format for sending data :
+	- normal : /user/data idUser posX posY posZ
+	- full user : /user/data idUser posX posY posZ xMin xMax yMin yMax zMin zMax
+	- separate data : 	/user/idUser/data/x posX
+						/user/idUser/data/x posY
+						/user/idUser/data/x posZ
+- track hands
+	- still some bugs in OSC. Doesn't delete lost hands
+	
+todo :
+- track and send skeleton data
+- send mask of users threw syphon
+
