@@ -1,0 +1,21 @@
+<MOTOR>
+    <val_0>-0.344446</val_0>
+</MOTOR>
+<RECORD_STATE>
+    <val_0>0.000000</val_0>
+</RECORD_STATE>
+<REPLAY_STATE>
+    <val_0>0.000000</val_0>
+</REPLAY_STATE>
+<TRACKING_STATE>
+    <val_0>0.000000</val_0>
+</TRACKING_STATE>
+<HAND_STATE>
+    <val_0>0.000000</val_0>
+</HAND_STATE>
+<OSC_STATE>
+    <val_0>1.000000</val_0>
+</OSC_STATE>
+<OSC_UPDATE>
+    <val_0>0.000000</val_0>
+</OSC_UPDATE>
