@@ -22,4 +22,7 @@ Already done :
 todo :
 - track and send skeleton data
 - send mask of users threw syphon
+- correct lost hand bugs
+- add gesture recognition
+- camera virtuelle pour corriger les coordonnées reel de l'espace du kinect a celui d'une camera virtuelle.
 
