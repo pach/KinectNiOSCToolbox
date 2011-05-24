@@ -25,4 +25,7 @@ todo :
 - correct lost hand bugs
 - add gesture recognition
 - camera virtuelle pour corriger les coordonnées reel de l'espace du kinect a celui d'une camera virtuelle.
+- normalisation des données
+- differentes gestion des id et donner envoyé (envoyer le plus proche...)
+- gestion des id sur mains
 

@@ -33,6 +33,8 @@ void ofxSceneUser::drawUser(){
 	ofSetColor (255, 0, 0) ; 
 	ofFill();
 	ofCircle(centerX, centerY, 20);
+    ofSetColor (0, 255, 255) ; 
+    ofDrawBitmapString(ofToString(idUser), centerX-2, centerY-2);
 	
 }
 

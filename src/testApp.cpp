@@ -22,7 +22,9 @@ void testApp::setup() {
     
     setupgui();
     
-
+    oscSend2.connect("192.168.1.30", 8000);
+    oscSend3.connect("192.168.1.32", 8000);
+    oscSend4.connect("192.168.1.36", 8000);
     
 }
 
@@ -443,6 +445,10 @@ void testApp::sendUser() {
                 break;
             case 2 :
                 oscSend.sendUserSeparate(it->first, *(it->second));
+                oscSend2.sendUserSeparate(it->first, *(it->second));
+                oscSend3.sendUserSeparate(it->first, *(it->second));
+                oscSend4.sendUserSeparate(it->first, *(it->second));
+
                 break;
             default:
                 oscSend.sendUser(it->first, *(it->second));

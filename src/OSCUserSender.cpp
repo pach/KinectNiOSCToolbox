@@ -29,7 +29,7 @@ void OSCUserSender::sendUserSeparate(int idUser, ofxSceneUser & user) {
     addr += ofToString(idUser);
     addr += "/x";
 	m.setAddress(addr);
-	m.addIntArg(user.centerWorldX);
+	m.addFloatArg(user.centerWorldX/6000.+.5);
     sender.sendMessage(m);
     
     m.clear();
@@ -38,7 +38,7 @@ void OSCUserSender::sendUserSeparate(int idUser, ofxSceneUser & user) {
     addr += ofToString(idUser);
     addr += "/y";
 	m.setAddress(addr);
-	m.addIntArg(user.centerWorldY);
+	m.addFloatArg(user.centerWorldY/6000.+.5);
     sender.sendMessage(m);
 
     m.clear();
@@ -47,7 +47,7 @@ void OSCUserSender::sendUserSeparate(int idUser, ofxSceneUser & user) {
     addr += ofToString(idUser);
     addr += "/z";
 	m.setAddress(addr);
-	m.addIntArg(user.centerWorldZ);
+	m.addFloatArg(user.centerWorldZ/6000.+.5);
     sender.sendMessage(m);	
     
     m.clear();
