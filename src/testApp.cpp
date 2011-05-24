@@ -445,10 +445,6 @@ void testApp::sendUser() {
                 break;
             case 2 :
                 oscSend.sendUserSeparate(it->first, *(it->second));
-                oscSend2.sendUserSeparate(it->first, *(it->second));
-                oscSend3.sendUserSeparate(it->first, *(it->second));
-                oscSend4.sendUserSeparate(it->first, *(it->second));
-
                 break;
             default:
                 oscSend.sendUser(it->first, *(it->second));

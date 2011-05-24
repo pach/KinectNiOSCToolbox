@@ -64,9 +64,6 @@ public:
 
     
     OSCUserSender oscSend;
-    OSCUserSender oscSend2;
-    OSCUserSender oscSend3;
-    OSCUserSender oscSend4;
     bool recordTimestamp, isSendingOSC, isSkeleton;
     bool kinectState;
     
