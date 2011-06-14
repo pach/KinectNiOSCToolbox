@@ -11,6 +11,41 @@
 #include "ofxOpenNIMacros.h"
 
 
+ofxSceneAnalyzer::ofxSceneAnalyzer () {
+    printf("new() ofxSceneAnalyzer\n");
+}
+ofxSceneAnalyzer::~ofxSceneAnalyzer () {
+
+    std::map<int, ofxSceneUser *>::iterator it = tmpUsers.begin();
+    std::map<int, ofxSceneUser *>::iterator itEnd = tmpUsers.end();
+    while (it != itEnd) {
+        delete(it->second);
+        it++;
+    }
+    tmpUsers.clear();
+    
+    it=users.begin();
+    itEnd=users.end();
+    while (it != itEnd) {
+        delete(it->second);
+        it++;
+    }
+    users.clear();
+    
+    std::vector<standbyUser *>::iterator its = standbyUsers.begin();
+    std::vector<standbyUser *>::iterator itsEnd = standbyUsers.end();
+    while(its != itsEnd){
+        delete((*its)->user);
+        delete(*its);
+        its++;
+    }
+    standbyUsers.clear();
+    
+    printf("delete() ofxSceneAnalyzer\n");
+}
+
+
+
 // Setup the user generator.
 //----------------------------------------
 bool ofxSceneAnalyzer::setup(ofxOpenNIContext* pContext, ofxDepthGenerator* pDepthGenerator) {
@@ -37,6 +72,10 @@ bool ofxSceneAnalyzer::setup(ofxOpenNIContext* pContext, ofxDepthGenerator* pDep
 	
 	result = g_SceneAnalyzer.StartGenerating();
 	SHOW_RC(result, "StartGenerating");
+    
+    minX = minY = -4000;
+    minZ = 500;
+    maxX = maxY = maxZ = 4000;
 }
 
 void ofxSceneAnalyzer::draw(){
@@ -54,17 +93,34 @@ void ofxSceneAnalyzer::drawUsers(){
 	
 }
 
+void ofxSceneAnalyzer::drawUsers(int x, int y, int w, int h){
+	std::map<int, ofxSceneUser *>::iterator it = users.begin(); 
+	std::map<int, ofxSceneUser *>::iterator itEnd = users.end(); 
+	
+	while (it != itEnd) {
+		it->second->drawUser(x, y, w, h) ; 
+		it ++;
+	}
+	
+}
+
 void ofxSceneAnalyzer::sceneAnalyze(){
 //	printf(".................begin analyze.................\n");
 	//reset users
 	std::map<int, ofxSceneUser *>::iterator it = users.begin(); 
 	std::map<int, ofxSceneUser *>::iterator itEnd = users.end(); 
-	
 	while (it != itEnd) {
 		it->second->reset() ; 
 		it ++;
 	}
-	
+	it = tmpUsers.begin(); 
+	itEnd = tmpUsers.end(); 
+	while (it != itEnd) {
+		it->second->reset() ; 
+		it ++;
+	}
+    
+    itEnd = users.end(); 
 
 	// get scene users map and depth map
 //	xn::SceneMetaData smd ; 
@@ -97,15 +153,18 @@ void ofxSceneAnalyzer::sceneAnalyze(){
 			//	find = true;
 			
 			if (label != 0){
-				// get user for this pixel
-				int userId = label ; 
+				// get id for this pixel
+				int userIdNi = label ; 
 				
-				itUser = users.find(userId);
-				
+				itUser = users.find(userIdNi);
+                
 				// if user doesn't exist, create it
 				if (itUser == itEnd){
-					newUser(userId);
-					itUser = users.find(userId);
+                    itUser = tmpUsers.find(userIdNi);
+                    if (itUser == tmpUsers.end()){
+                        newTmpUser(userIdNi);
+                        itUser = tmpUsers.find(userIdNi);
+                    }
 				}
 							
 				// add depth and pxl info to the user
@@ -117,21 +176,16 @@ void ofxSceneAnalyzer::sceneAnalyze(){
 		}
 	}
 	
-	// finalyze users si users toujours n'as pas de pixels -> le supprime
+    //finalyze current users
 	it = users.begin() ; 
+    itEnd = users.end() ;
 	while (it != itEnd) {
 		// finalyze users
 		if(!it->second->finalyze()){
 			// if return false delete user
 			ofxSceneUser * user = it->second ; 
-			
-			it ++ ;
-			
-			// a modif -> devrait mettre user dans file d'attente pour x seconde au cas ou reapparaisse
-			//lostUser(user->idUser);
-			deleteUser(user->idUser);
-			delete(user) ; 
-			
+            it ++ ;
+			lostUser(*user);
 		}
 		else {
             XnVector3D coordImg, coordWorld ;
@@ -139,12 +193,23 @@ void ofxSceneAnalyzer::sceneAnalyze(){
             coordImg.Y = it->second->centerY ;
             coordImg.Z = it->second->centerZ ;
             depth_generator->getXnDepthGenerator().ConvertProjectiveToRealWorld(1, &coordImg, &coordWorld);
-            it->second->centerWorldX = coordWorld.X ;
-            it->second->centerWorldY = coordWorld.Y ;
-            it->second->centerWorldZ = coordWorld.Z ;
+            it->second->centerWorldX = coordWorld.X;
+            it->second->centerWorldY = coordWorld.Y;
+            it->second->centerWorldZ = coordWorld.Z;
+
+            it->second->normX = ofMap(coordWorld.X, minX, maxX, 0., 1.) ;
+            it->second->normY = ofMap(coordWorld.Y, minY, maxY, 0., 1.) ;
+            it->second->normZ = ofMap(coordWorld.Z, minZ, maxZ, 0., 1.) ;
+            
+            //cout<<"user finalisé, coord : "<<it->second->centerX<<", "<<it->second->centerY<<"' "<<it->second->centerZ<<" ; "<<it->second->centerWorldX<<", "<<it->second->centerWorldY<<", "<<it->second->centerWorldZ<<" ; "<<it->second->normX<<", "<<it->second->normY<<", "<<it->second->normZ<<endl;
+
+            
 			it++ ; 
         }
 	}
+    // finalyze new users
+    newUsersFinalize();
+
 	
 	//if (find) printf (".\n");
 //	printf(".................end analyze.................\n.............................................\n\n");
@@ -152,25 +217,180 @@ void ofxSceneAnalyzer::sceneAnalyze(){
 
 void ofxSceneAnalyzer::update(){
 	sceneAnalyze() ; 
+    updateStandby() ;
 }
 
-void ofxSceneAnalyzer::newUser(int idUser) {
-	users.insert(std::pair<int, ofxSceneUser *>(idUser, new ofxSceneUser(idUser, width, height))) ;			 
-	ofNotifyEvent(newUserEvent, idUser, this);
+void ofxSceneAnalyzer::updateStandby(){
+	// parcours les standby
+    vector<standbyUser *>::iterator it = standbyUsers.begin();
+    vector<standbyUser *>::iterator itEnd = standbyUsers.end();
+    
+    while (it != itEnd) {
+        // met a jour le temps de standby
+        (*it)->updateUser();
+        // si temps sup a tempsMaxStandby, delete le user    
+        if ((*it)->isOld()){
+            deleteUser(*((*it)->user));
+            ofxSceneUser* tmpUser = (*it)->user ;
+            vector<standbyUser *>::iterator itTmp = it ;
+            it++;
+            if((*itTmp) != NULL)delete((*itTmp));
+            standbyUsers.erase(itTmp);
+            if(tmpUser != NULL) delete(tmpUser);
+            
+            printCorresp();
+        }else{
+            it ++;
+        }
+    }
+    
 }
 
-void ofxSceneAnalyzer::deleteUser(int idUser) {
-	users.erase(idUser);
-	ofNotifyEvent(deleteUserEvent, idUser, this);
+void ofxSceneAnalyzer::newTmpUser(int idUser){
+    cout<<"new tmp user"<<endl;
+    tmpUsers.insert(std::pair<int, ofxSceneUser *>(idUser, new ofxSceneUser(idUser, idUser, width, height))) ;
 }
 
-void ofxSceneAnalyzer::lostUser(int idUser) {
-	//users.erase(idUser);
-	ofNotifyEvent(lostUserEvent, idUser, this);
+void ofxSceneAnalyzer::newUsersFinalize() {
+    
+    //parcours les nouveaus users
+    map<int,ofxSceneUser*>::iterator itU = tmpUsers.begin();
+    map<int,ofxSceneUser*>::iterator itUEnd = tmpUsers.end();
+    int idUserNi ;
+    while (itU != itUEnd) {
+        // finalize le user
+        if(itU->second->isNew == 0 && itU->second->finalyze()){
+            XnVector3D coordImg, coordWorld ;
+            coordImg.X = itU->second->centerX ;
+            coordImg.Y = itU->second->centerY ;
+            coordImg.Z = itU->second->centerZ ;
+            depth_generator->getXnDepthGenerator().ConvertProjectiveToRealWorld(1, &coordImg, &coordWorld);
+            itU->second->centerWorldX = coordWorld.X;
+            itU->second->centerWorldY = coordWorld.Y;
+            itU->second->centerWorldZ = coordWorld.Z;
+            
+            itU->second->normX = ofMap(coordWorld.X, minX, maxX, 0., 1.) ;
+            itU->second->normY = ofMap(coordWorld.Y, minY, maxY, 0., 1.) ;
+            itU->second->normZ = ofMap(coordWorld.Z, minZ, maxZ, 0., 1.) ;
+            
+            //cout<<"new user finalisé, coord : "<<itU->second->centerX<<", "<<itU->second->centerY<<"' "<<itU->second->centerZ<<" ; "<<itU->second->centerWorldX<<", "<<itU->second->centerWorldY<<", "<<itU->second->centerWorldZ<<" ; "<<itU->second->normX<<", "<<itU->second->normY<<", "<<itU->second->normZ<<endl;
+            
+            idUserNi = itU->second->idUserNi ;
+
+            // recherche dans standby si user porte num idUser et ou proche de la position de reapparition 
+            vector<standbyUser *>::iterator it = standbyUsers.begin();
+            vector<standbyUser *>::iterator itEnd = standbyUsers.end();
+            bool found = false ;
+            int idOld ; 
+            while (it != itEnd && !found ) {
+                idOld = (*it)->isUser(idUserNi, coordWorld.X, coordWorld.Y, coordWorld.Z);
+                if (idOld != -1){
+                    found = true;
+                }else {
+                    it++;
+                }
+            }
+            if (found){      
+                itU->second->idUser = idOld ;
+                itU->second->idUserNi = idUserNi ;
+                users.insert(std::pair<int, ofxSceneUser *>(idUserNi,  itU->second)) ;
+                map<int,int>::iterator itID = correspID.find(idOld);
+                if (itID != correspID.end()) {
+                    itID->second = idUserNi;
+                }else{
+                    correspID.insert(pair<int, int>(idOld, idUserNi));
+                }
+                standbyUser * usTmp = (*it);
+                standbyUsers.erase(it);
+				if (usTmp != NULL) {
+					if(usTmp->user != NULL) delete(usTmp->user);
+					delete (usTmp);
+				}
+                ofNotifyEvent(retrieveUserEvent, idOld, this);
+                cout<<"retrieve user "<<idOld<<" idNi "<<idUserNi<<endl;
+            }else{
+                // sinon cree nouvel user
+                //verifie que id non utilisé
+                int idUser = idUserNi;
+                if(correspID.find(idUser)!=correspID.end()){
+                    idUser = getFreeId();
+                }
+                //cree user
+                itU->second->idUser = idUser ; 
+                itU->second->idUserNi = idUserNi ; 
+                users.insert(std::pair<int, ofxSceneUser *>(idUserNi, itU->second)) ;	
+                correspID.insert(pair<int, int>(idUser, idUserNi));
+                ofNotifyEvent(newUserEvent, idUser, this);
+                
+                cout<<"new user "<<idUser<<" idNi "<<idUserNi<<endl;
+                
+            }   
+            printCorresp();
+            
+        }else{
+            //cout<<"new user "<<itU->second->idUser<<" not finalize or too new"<<endl;
+        }
+        
+        itU ++;
+    }
+    
+    // passe isNew false sur nouveau user et delete old users 
+    itU = tmpUsers.begin();
+    while(itU != itUEnd){
+        if (itU->second->isNew){
+            itU->second->isNew --;
+            itU ++;
+        }else{
+            map<int, ofxSceneUser*>::iterator itTmp = itU;
+            itU++ ;
+            tmpUsers.erase(itTmp);
+        }
+        
+    }
+    //tmpUsers.clear();
 }
 
-void ofxSceneAnalyzer::retrieveUser(int idUser) {
-	ofNotifyEvent(retrieveUserEvent, idUser, this);
+int ofxSceneAnalyzer::getFreeId(){
+    bool found = false ;
+    int id=1 ;
+    while (!found) {
+        // si l'id n'existe pas...
+        if (correspID.find(id)==correspID.end()){
+            found = true ;
+        }else{
+            id ++ ;
+        }
+    }
+    return id ;
+}
+
+void ofxSceneAnalyzer::deleteUser(ofxSceneUser & user) {
+    printf("delete user %i, %i \n", user.idUser, user.idUserNi);
+	ofNotifyEvent(deleteUserEvent, user.idUser, this);
+    correspID.erase(correspID.find(user.idUser));
+}
+
+void ofxSceneAnalyzer::lostUser(ofxSceneUser & user) {
+    std::map<int, ofxSceneUser*>::iterator tmpUser = users.find(user.idUserNi) ;
+    if (tmpUser != users.end()){
+        standbyUsers.push_back(new standbyUser(tmpUser->second, STANDBY_TIME));
+        printf("lost user %i, %i - ", user.idUser, user.idUserNi);
+        users.erase(tmpUser);
+    }else{
+        printf("doesn't find user %i in users map\n", user.idUser);
+    }
+	ofNotifyEvent(lostUserEvent, user.idUser, this);
+    map<int,int>::iterator itID = correspID.find(user.idUser);
+    if (itID != correspID.end()){
+        itID->second = -1 ;
+    }
+    printCorresp();
+}
+
+void ofxSceneAnalyzer::retrieveUser(ofxSceneUser & user) {
+    printf("retrieve user %i, %i \n", user.idUser, user.idUserNi);
+    printCorresp();
+	ofNotifyEvent(retrieveUserEvent, user.idUser, this);
 }
 
 /*
@@ -181,4 +401,31 @@ ofEvent <int> retrieveUserEvent ;
 */
 std::map<int, ofxSceneUser *> ofxSceneAnalyzer::getUsers() {
 	return users ; 
+}
+
+void ofxSceneAnalyzer::setNormalize(int minX, int minY, int minZ, int maxX, int maxY, int maxZ){
+    this->minX = minX ;
+    this->minY = minY ;
+    this->minZ = minZ ;
+    this->maxX = maxX ;
+    this->maxY = maxY ;
+    this->maxZ = maxZ ;
+}
+void ofxSceneAnalyzer::setNormalizeMinX(int minX){
+    this->minX = minX ;
+}
+void ofxSceneAnalyzer::setNormalizeMinY(int minY){
+    this->minY = minY ;
+}
+void ofxSceneAnalyzer::setNormalizeMinZ(int minZ){
+    this->minZ = minZ ;
+}
+void ofxSceneAnalyzer::setNormalizeMaxX(int maxX){
+    this->maxX = maxX ;
+}
+void ofxSceneAnalyzer::setNormalizeMaxY(int maxY){
+    this->maxY = maxY ;
+}
+void ofxSceneAnalyzer::setNormalizeMaxZ(int maxZ){
+    this->maxZ = maxZ ;
 }

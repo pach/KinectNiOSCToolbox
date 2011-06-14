@@ -18,15 +18,20 @@ public:
 	void connect (std::string host, int port);
 	
 	void sendNewUser (int idUser) ; 
-	void sendUser (int idUser, ofxSceneUser & user);
-   	void sendUserSeparate (int idUser, ofxSceneUser & user);
-	void sendFullUser (int idUser, ofxSceneUser & user);
+	void sendUser (ofxSceneUser & user);
+	void sendNormalizeUser (ofxSceneUser & user);
+   	void sendUserSeparate (ofxSceneUser & user);
+	void sendFullUser (ofxSceneUser & user);
 	void sendDeleteUser (int idUser) ; // lost user, wait to see if retrieving or not
 	void sendLostUser (int idUser) ;
 	void sendRetrieveUser (int idUser) ; 
     
+    void sendMsg(string msg, float data);
+    void sendMsg(string msg, int data);
+    
     void sendHand(int idHand, ofPoint pos);
     void sendHandSeparate(int idHand, ofPoint pos);
+    
 private:
 	std::string host ; 
 	int port ; 
