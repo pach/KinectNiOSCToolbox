@@ -474,13 +474,10 @@ void testApp::sendHands() {
     while (it!=itEnd && isTrackingHands) {
         switch (oscTrackingMode) {
             case 0 :
-                oscSend.sendHand((*it)->nID, (*it)->progPos);
+                oscSend.sendHand((*it)->handID, (*it)->projectPos);
                 break;
             case 1 :
-                oscSend.sendHand((*it)->nID, (*it)->progPos);
-                break;
-            case 2 :
-                oscSend.sendHandSeparate((*it)->nID, (*it)->progPos);
+                oscSend.sendHand((*it)->handID, (*it)->progPos);
                 break;
             default:
                 oscSend.sendHand((*it)->nID, (*it)->progPos);
@@ -488,5 +485,39 @@ void testApp::sendHands() {
         }
         it ++;
     }
+}
+
+void drawPointClouds(int x, int y){
+    glPushMatrix();
+	
+    glTranslatef(x, y, 0);
+    
+	int w = liveDepth->getWidth();
+	int h = liveDepth->getHeight();
+	
+	glTranslatef(w, h/2, -500);
+	
+	
+	glBegin(GL_POINTS);
+	
+	int step = 1;
+	
+	for(int y = 0; y < h; y += step) {
+		for(int x = 0; x < w; x += step) {
+			ofPoint pos = user_generator->getWorldCoordinateAt(x, y, userID);
+			if (pos.z == 0 && isCPBkgnd) continue;	// gets rid of background -> still a bit weird if userID > 0...
+			ofColor color = user_generator->getWorldColorAt(x,y, userID);
+			glColor4ub((unsigned char)color.r, (unsigned char)color.g, (unsigned char)color.b, (unsigned char)color.a);
+			glVertex3f(pos.x, pos.y, pos.z);
+		}
+	}
+	
+	glEnd();
+	
+	glColor3f(1.0f, 1.0f, 1.0f);
+	
+	glPopMatrix();
+}
+
 }
 

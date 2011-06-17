@@ -34,6 +34,8 @@ public:
 	void retrieveUser (int & idUser) ; 
     void sendUser ();
     void sendHands ();
+    
+    void drawPointClouds(int x, int y);
 	
 	void	setupRecording(string _filename = "");
 	void	setupPlayback(string _filename);
