@@ -212,7 +212,7 @@ void testApp::setupRecording(string _filename) {
 	liveContext.toggleRegisterViewport();
 	liveContext.toggleMirror();
 	
-    
+    cloud.setup(liveDepth.getWidth(), liveDepth.getHeight(), &liveDepth, &liveImage);
     
 	oniRecorder.setup(&liveContext, ONI_STREAMING);	
 	//oniRecorder.setup(&recordContext, ONI_CYCLIC, 60); 
@@ -234,7 +234,7 @@ void testApp::setupPlayback(string _filename) {
 	playContext.toggleRegisterViewport();
 	playContext.toggleMirror();
     
-    
+    cloud.setup(playDepth.getWidth(), playDepth.getHeight(), &playDepth, &playImage);
 	
 }
 
@@ -334,6 +334,8 @@ void testApp::draw(){
 	
 	glPopMatrix();
 	
+    drawPointClouds(0, 480);
+    
 	ofSetColor(255, 255, 0);
 	
 	string statusPlay		= (string)(isLive ? "LIVE STREAM" : "PLAY STREAM");
@@ -443,6 +445,24 @@ void testApp::sendUser() {
     }
 }
 
+
+void testApp::sendSkeleton (){
+    if (isSendingOSC && isSkeleton){
+        ofxUserGenerator * us ;
+        if (isLive)
+            us = &liveUser ;
+        else 
+            us = &playUser ;
+
+        // pour chaque user tracké
+        for (int i=0; i < us->getNumberOfTrackedUsers(); i++) {
+            ofxTrackedUser *u = us->getTrackedUser(i);
+            //envoi de l'user en osc
+            oscSend.sendSkeleton(u, i);
+        }
+    }
+}
+
 void testApp::newUser (int & idUser) {
     if (isSendingOSC)
         oscSend.sendNewUser(idUser);
@@ -462,16 +482,20 @@ void testApp::retrieveUser (int & idUser) {
 
 void testApp::sendHands() {
 	vector<ofxTrackedHand*> hands ;
+    int nbHands ;
     if (isLive){
         hands = liveHandTracker.tracked_hands;
+        nbHands = liveHandTracker.getNumTrackedHands();
     }else {
         hands = playHandTracker.tracked_hands;
+        nbHands = playHandTracker.getNumTrackedHands();
     }
     
     vector<ofxTrackedHand*>::iterator it = hands.begin();
     vector<ofxTrackedHand*>::iterator itEnd = hands.end();
+    int num = 0 ; 
     
-    while (it!=itEnd && isTrackingHands) {
+    while (it!=itEnd && isTrackingHands && num < nbHands) {
         switch (oscTrackingMode) {
             case 0 :
                 oscSend.sendHand((*it)->handID, (*it)->projectPos);
@@ -479,21 +503,30 @@ void testApp::sendHands() {
             case 1 :
                 oscSend.sendHand((*it)->handID, (*it)->progPos);
                 break;
-            default:
+            case 2 :
                 oscSend.sendHand((*it)->nID, (*it)->progPos);
+                break;
+            case 3 :
+                oscSend.sendHandSeparate((*it)->handID, (*it)->progPos);
+                break;
+            default:
+                oscSend.sendHand((*it)->handID, (*it)->progPos);
                 break;
         }
         it ++;
+        num ++;
     }
 }
 
-void drawPointClouds(int x, int y){
+void testApp::drawPointClouds(int x, int y){
     glPushMatrix();
 	
     glTranslatef(x, y, 0);
     
-	int w = liveDepth->getWidth();
-	int h = liveDepth->getHeight();
+    cloud.drawCloud();
+    /*
+	int w = liveDepth.getWidth();
+	int h = liveDepth.getHeight();
 	
 	glTranslatef(w, h/2, -500);
 	
@@ -504,20 +537,23 @@ void drawPointClouds(int x, int y){
 	
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
-			ofPoint pos = user_generator->getWorldCoordinateAt(x, y, userID);
-			if (pos.z == 0 && isCPBkgnd) continue;	// gets rid of background -> still a bit weird if userID > 0...
-			ofColor color = user_generator->getWorldColorAt(x,y, userID);
+            XnVector3D coordImg, coordWorld ;
+            coordImg.X = x ;
+            coordImg.Y = y ;
+            coordImg.Z = liveDepth.getPixelDepth(x,y) ;
+            liveDepth.getXnDepthGenerator().ConvertProjectiveToRealWorld(1, &coordImg, &coordWorld);
+            
+			ofPoint pos = ofPoint(coordWorld.X, coordWorld.Y, coordWorld.Z);
+			ofColor color = liveImage.getXnImageGenerator().getWorldColorAt(x, y);
 			glColor4ub((unsigned char)color.r, (unsigned char)color.g, (unsigned char)color.b, (unsigned char)color.a);
 			glVertex3f(pos.x, pos.y, pos.z);
 		}
 	}
 	
 	glEnd();
-	
+	*/
 	glColor3f(1.0f, 1.0f, 1.0f);
 	
 	glPopMatrix();
-}
-
 }
 

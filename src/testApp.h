@@ -9,6 +9,8 @@
 #include "ofxControlPanel.h"
 #include "OSCUserSender.h"
 
+#include "PointClouds.h"
+
 class testApp : public ofBaseApp{
 	
 public:
@@ -34,6 +36,7 @@ public:
 	void retrieveUser (int & idUser) ; 
     void sendUser ();
     void sendHands ();
+    void sendSkeleton ();
     
     void drawPointClouds(int x, int y);
 	
@@ -77,8 +80,8 @@ public:
     guiTypeTextInput *oscPath ;
     guiTypeTextInput *oscPort ;
     int oscTrackingMode ;
-
-	
+    
+    PointClouds cloud ;
 
 };
 

@@ -174,7 +174,7 @@ void OSCUserSender::sendHand (int idHand, ofPoint pos) {
     string addr = "/hand/" + ofToString(idHand) + "";
     
 	m.setAddress(addr);
-	m.addIntArg(idHand);
+	//m.addIntArg(idHand);
     m.addFloatArg(pos.x);
     m.addFloatArg(pos.y);
     m.addFloatArg(pos.z);
@@ -203,4 +203,158 @@ void OSCUserSender::sendHandSeparate (int idHand, ofPoint pos) {
     m.clear();
 }
 
+void OSCUserSender::sendSkeleton(ofxTrackedUser *us, int idUser){
+    ofxOscMessage m;
+    string baseAddr = "/skeleton/" + ofToString(idUser) ;
+    // torso
+    string addr = baseAddr + "/left_upper_torso";
+    m.setAddress(addr);
+	m.addFloatArg(us->left_upper_torso.position[0].X);
+    m.addFloatArg(us->left_upper_torso.position[0].Y);
+    m.addFloatArg(us->left_upper_torso.position[1].X);
+    m.addFloatArg(us->left_upper_torso.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/right_upper_torso";
+    m.setAddress(addr);
+	m.addFloatArg(us->right_upper_torso.position[0].X);
+    m.addFloatArg(us->right_upper_torso.position[0].Y);
+    m.addFloatArg(us->right_upper_torso.position[1].X);
+    m.addFloatArg(us->right_upper_torso.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    // left lower torso + leg
+    addr = baseAddr + "/left_lower_torso";
+    m.setAddress(addr);
+	m.addFloatArg(us->left_lower_torso.position[0].X);
+    m.addFloatArg(us->left_lower_torso.position[0].Y);
+    m.addFloatArg(us->left_lower_torso.position[1].X);
+    m.addFloatArg(us->left_lower_torso.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/left_upper_leg";
+    m.setAddress(addr);
+	m.addFloatArg(us->left_upper_leg.position[0].X);
+    m.addFloatArg(us->left_upper_leg.position[0].Y);
+    m.addFloatArg(us->left_upper_leg.position[1].X);
+    m.addFloatArg(us->left_upper_leg.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/left_lower_leg";
+    m.setAddress(addr);
+	m.addFloatArg(us->left_lower_leg.position[0].X);
+    m.addFloatArg(us->left_lower_leg.position[0].Y);
+    m.addFloatArg(us->left_lower_leg.position[1].X);
+    m.addFloatArg(us->left_lower_leg.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    // right lower torso + leg
+    addr = baseAddr + "/right_lower_torso";
+    m.setAddress(addr);
+	m.addFloatArg(us->right_lower_torso.position[0].X);
+    m.addFloatArg(us->right_lower_torso.position[0].Y);
+    m.addFloatArg(us->right_lower_torso.position[1].X);
+    m.addFloatArg(us->right_lower_torso.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/right_upper_leg";
+    m.setAddress(addr);
+	m.addFloatArg(us->right_upper_leg.position[0].X);
+    m.addFloatArg(us->right_upper_leg.position[0].Y);
+    m.addFloatArg(us->right_upper_leg.position[1].X);
+    m.addFloatArg(us->right_upper_leg.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/right_lower_leg";
+    m.setAddress(addr);
+	m.addFloatArg(us->right_lower_leg.position[0].X);
+    m.addFloatArg(us->right_lower_leg.position[0].Y);
+    m.addFloatArg(us->right_lower_leg.position[1].X);
+    m.addFloatArg(us->right_lower_leg.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    // hip
+    addr = baseAddr + "/hip";
+    m.setAddress(addr);
+	m.addFloatArg(us->hip.position[0].X);
+    m.addFloatArg(us->hip.position[0].Y);
+    m.addFloatArg(us->hip.position[1].X);
+    m.addFloatArg(us->hip.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    // right arm + shoulder
+    addr = baseAddr + "/right_shoulder";
+    m.setAddress(addr);
+	m.addFloatArg(us->right_shoulder.position[0].X);
+    m.addFloatArg(us->right_shoulder.position[0].Y);
+    m.addFloatArg(us->right_shoulder.position[1].X);
+    m.addFloatArg(us->right_shoulder.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/right_upper_arm";
+    m.setAddress(addr);
+	m.addFloatArg(us->right_upper_arm.position[0].X);
+    m.addFloatArg(us->right_upper_arm.position[0].Y);
+    m.addFloatArg(us->right_upper_arm.position[1].X);
+    m.addFloatArg(us->right_upper_arm.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/right_lower_arm";
+    m.setAddress(addr);
+	m.addFloatArg(us->right_lower_arm.position[0].X);
+    m.addFloatArg(us->right_lower_arm.position[0].Y);
+    m.addFloatArg(us->right_lower_arm.position[1].X);
+    m.addFloatArg(us->right_lower_arm.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    // left arm + shoulder
+    addr = baseAddr + "/left_shoulder";
+    m.setAddress(addr);
+	m.addFloatArg(us->left_shoulder.position[0].X);
+    m.addFloatArg(us->left_shoulder.position[0].Y);
+    m.addFloatArg(us->left_shoulder.position[1].X);
+    m.addFloatArg(us->left_shoulder.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/left_upper_arm";
+    m.setAddress(addr);
+	m.addFloatArg(us->left_upper_arm.position[0].X);
+    m.addFloatArg(us->left_upper_arm.position[0].Y);
+    m.addFloatArg(us->left_upper_arm.position[1].X);
+    m.addFloatArg(us->left_upper_arm.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    addr = baseAddr + "/left_lower_arm";
+    m.setAddress(addr);
+	m.addFloatArg(us->left_lower_arm.position[0].X);
+    m.addFloatArg(us->left_lower_arm.position[0].Y);
+    m.addFloatArg(us->left_lower_arm.position[1].X);
+    m.addFloatArg(us->left_lower_arm.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();
+    
+    // neck
+    addr = baseAddr + "/neck";
+    m.setAddress(addr);
+	m.addFloatArg(us->neck.position[0].X);
+    m.addFloatArg(us->neck.position[0].Y);
+    m.addFloatArg(us->neck.position[1].X);
+    m.addFloatArg(us->neck.position[1].Y);
+    sender.sendMessage(m);
+    m.clear();   
+}
 

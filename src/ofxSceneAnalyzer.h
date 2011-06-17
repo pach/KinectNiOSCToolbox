@@ -121,6 +121,8 @@ public:
 	
     int getFreeId();
     
+    void drawPointClouds();
+    
     string printUsers(){
         stringstream str;
         map<int, ofxSceneUser *>::iterator it = users.begin();

@@ -10,6 +10,7 @@
 
 #include "ofxOsc.h"
 #include "ofxSceneUser.h"
+#include "ofxTrackedUser.h"
 
 class OSCUserSender {
 
@@ -31,6 +32,8 @@ public:
     
     void sendHand(int idHand, ofPoint pos);
     void sendHandSeparate(int idHand, ofPoint pos);
+    
+    void sendSkeleton(ofxTrackedUser *us, int idUser);
     
 private:
 	std::string host ; 
