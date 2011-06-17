@@ -79,7 +79,12 @@ public:
     guiTypeTextInput *recPath ;
     guiTypeTextInput *oscPath ;
     guiTypeTextInput *oscPort ;
+
     int oscTrackingMode ;
+
+    guiTypeTextInput *skeletonPath ;
+    simpleFileLister skeletonFile;
+    string skeletonFilePath ;
     
     PointClouds cloud ;
 

@@ -35,12 +35,14 @@ void testApp::setupgui() {
     ofxControlPanel::setBackgroundColor(simpleColor(30, 30, 30, 150));
     ofxControlPanel::setTextColor(simpleColor(255, 255, 255, 255));
     
-    gui.setup("kinect tools", 0, 0, ofGetWidth(), 500);
-    gui.addPanel("kinect tools", 3, false);
+    gui.setup("kinect tools", 0, 0, 750, 500);
+    gui.addPanel("kinect tools", 2, false);
+    gui.addPanel("tracking", 1, false);
+    gui.addPanel("skeleton", 1, false);
     
     gui.setWhichPanel(0);
-    gui.setWhichColumn(0);
     
+    gui.setWhichColumn(0);
     gui.addSlider("motor pos", "MOTOR", 0, -31., 31., true);
     gui.addToggle("enable kinect", "KINECT_STATE", false);
     gui.addToggle("record", "RECORD_STATE", false);
@@ -48,21 +50,13 @@ void testApp::setupgui() {
     recPath = gui.addTextInput("record path", "path", ofGetWidth()/3.-10);
     gui.addToggle("replay", "REPLAY_STATE", false);
     replayFile.listDir("record/");
-    gui.addFileLister("replay path", &replayFile, ofGetWidth()/3.-10, 50);
+    gui.addFileLister("replay path", &replayFile, 230., 50);
     
-    gui.setWhichColumn(1);
     gui.addToggle("activate tracking", "TRACKING_STATE", true);
     gui.addToggle("activate hand", "HAND_STATE", false);
     gui.addToggle("activate skeleton", "SKELETON_STATE", false);
     
-    gui.addSlider("norm min x", "TRACK_MIN_X", -3000, -5000, 5000, true);
-    gui.addSlider("norm max x", "TRACK_MAX_X", 3000, -5000, 5000, true);
-    gui.addSlider("norm min y", "TRACK_MIN_Y", -3000, -5000, 5000, true);
-    gui.addSlider("norm max y", "TRACK_MAX_Y", 3000, -5000, 5000, true);
-    gui.addSlider("norm min z", "TRACK_MIN_Z", 0., 0, 10000, true);
-    gui.addSlider("norm max z", "TRACK_MAX_Z", 5000, 0, 10000, true);
-    
-    gui.setWhichColumn(3);
+    gui.setWhichColumn(1);
     gui.addToggle("enable OSC", "OSC_STATE", true);
     oscPath = gui.addTextInput("OSC addr", "OSC_ADDR", "localhost", ofGetWidth()/3.-10);
     oscPort = gui.addTextInput("OSC port", "OSC_PORT", "8888", ofGetWidth()/3.-10);
@@ -73,6 +67,24 @@ void testApp::setupgui() {
     oscTrackMode.push_back("full user");
     oscTrackMode.push_back("separate data (normalize coord)");
     gui.addMultiToggle("OSC tracking mode", "OSC_TRACKING_MODE", 0, oscTrackMode);
+    
+    gui.setWhichPanel(1);
+    
+    gui.setWhichColumn(0);    
+    gui.addSlider("norm min x", "TRACK_MIN_X", -3000, -5000, 5000, true);
+    gui.addSlider("norm max x", "TRACK_MAX_X", 3000, -5000, 5000, true);
+    gui.addSlider("norm min y", "TRACK_MIN_Y", -3000, -5000, 5000, true);
+    gui.addSlider("norm max y", "TRACK_MAX_Y", 3000, -5000, 5000, true);
+    gui.addSlider("norm min z", "TRACK_MIN_Z", 0., 0, 10000, true);
+    gui.addSlider("norm max z", "TRACK_MAX_Z", 5000, 0, 10000, true);
+    
+    gui.setWhichPanel(2);
+    gui.setWhichColumn(0);    
+    skeletonPath = gui.addTextInput("record path", "path", ofGetWidth()/3.-10);
+    gui.addToggle("record skeleton data", "SKEL_RECORD", false);
+    skeletonFile.listDir("skeleton/");
+    gui.addFileLister("skeleton path", &skeletonFile, 450, 50);
+    gui.addToggle("force reload skeleton data", "SKEL_FORCE_RELOAD", false);
     
     gui.loadSettings("controlPanelSettings.xml");
    
@@ -190,6 +202,19 @@ void testApp::eventsgui(guiCallbackData & data){
         liveScene.setNormalizeMaxZ(data.getInt(0));
         playScene.setNormalizeMaxZ(data.getInt(0));
     }
+    else if (event == "SKEL_RECORD"){
+        if(isSkeleton) {
+            string path = "skeleton/" + skeletonPath->getValueText();
+            if(isLive) {
+                liveUser.recordCalibrationData(path);
+            }else {
+                playUser.recordCalibrationData(path);
+            }
+        }
+    }
+    else if (event == "SKEL_FORCE_RELOAD"){
+        
+    }
     
 }
 
@@ -282,6 +307,8 @@ void testApp::update(){
             sendUser();
         if (isTrackingHands)
             sendHands();
+        if (isSkeleton)
+            sendSkeleton();
     }
     
     gui.update();
@@ -517,6 +544,7 @@ void testApp::sendHands() {
         num ++;
     }
 }
+
 
 void testApp::drawPointClouds(int x, int y){
     glPushMatrix();
