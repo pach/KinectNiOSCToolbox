@@ -87,6 +87,7 @@ public:
     string skeletonFilePath ;
     
     PointClouds cloud ;
+    float cloudRotate ;
 
 };
 

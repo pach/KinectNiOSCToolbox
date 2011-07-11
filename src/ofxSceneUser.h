@@ -10,7 +10,7 @@
 #pragma once 
 
 #include "ofMain.h"
-// #include "ofxSyphonServer.h"
+#include "ofxSyphonServer.h"
 
 class ofxSceneUser {
 
@@ -44,6 +44,6 @@ private:
 	bool isCalculating ;
 	unsigned char * maskTexture ; 
     
-//    ofxSyphonServer syphonText ;
+    ofxSyphonServer syphonText ;
     
 };

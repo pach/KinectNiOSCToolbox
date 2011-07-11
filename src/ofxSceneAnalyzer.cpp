@@ -76,6 +76,7 @@ bool ofxSceneAnalyzer::setup(ofxOpenNIContext* pContext, ofxDepthGenerator* pDep
     minX = minY = -4000;
     minZ = 500;
     maxX = maxY = maxZ = 4000;
+    
 }
 
 void ofxSceneAnalyzer::draw(){

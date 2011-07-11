@@ -21,6 +21,8 @@ void testApp::setup() {
     
     setupgui();
     
+    cloudRotate = 0.;
+    
     ofAddListener(liveScene.newUserEvent, this, &testApp::newUser);
     ofAddListener(playScene.newUserEvent, this, &testApp::newUser);
     ofAddListener(liveScene.deleteUserEvent, this, &testApp::deleteUser);
@@ -311,6 +313,8 @@ void testApp::update(){
             sendSkeleton();
     }
     
+    cloud.updateCloud();
+    
     gui.update();
 }
 
@@ -417,7 +421,7 @@ void testApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-	
+	cloudRotate = y;
 }
 
 //--------------------------------------------------------------
@@ -550,7 +554,7 @@ void testApp::drawPointClouds(int x, int y){
     glPushMatrix();
 	
     glTranslatef(x, y, 0);
-    
+    glRotatef(cloudRotate, 0, 1, 0);
     cloud.drawCloud();
     /*
 	int w = liveDepth.getWidth();
