@@ -19,10 +19,10 @@ ofxSceneUser::ofxSceneUser (int userId, int userNi, int w, int h){
 	maskTexture = (unsigned char *)malloc(sizeof(unsigned char *)*width*height*4);
     
     isNew = 3 ;
-	
-   syphonText.setName("user"+ofToString(idUser));
     
 	printf("new() user %i, wh : %i, %i\n", idUser, width, height);
+    
+    syphonText.setName("user"+ofToString(idUser));
 }
 
 /*
@@ -67,6 +67,7 @@ void ofxSceneUser::drawUser(){
     ofSetColor (0, 255, 255) ; 
     ofDrawBitmapString(ofToString(idUser), centerX-2, centerY-2);
     
+    syphonText.setName("user"+ofToString(idOrder));
     syphonText.publishTexture(&mask);
 	
 }

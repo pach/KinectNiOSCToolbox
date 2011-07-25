@@ -56,9 +56,9 @@ public:
 	ofxImageGenerator	liveImage, playImage; 
 #endif
 	
-	ofxHandGenerator	liveHandTracker, playHandTracker;
+	//ofxHandGenerator	liveHandTracker, playHandTracker;
 	
-	ofxUserGenerator	liveUser, playUser;
+	//ofxUserGenerator	liveUser, playUser;
 	ofxOpenNIRecorder	oniRecorder;
     
     ofxSceneAnalyzer    liveScene, playScene ;

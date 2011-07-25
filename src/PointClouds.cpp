@@ -97,8 +97,6 @@ void PointClouds::updateCloudFromMask(ofTexture & mask){
 
 void PointClouds::drawCloud(){
     if(isInited){
-      //  glTranslatef(width, height/2, -500);
-        
         
         glBegin(GL_POINTS);
         

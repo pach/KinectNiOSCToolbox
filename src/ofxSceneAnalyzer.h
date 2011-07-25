@@ -124,6 +124,8 @@ public:
     
     void drawPointClouds();
     
+    int ordering ; //0 = apparition, 1 = taille, 2 = position
+    
     string printUsers(){
         stringstream str;
         map<int, ofxSceneUser *>::iterator it = users.begin();
@@ -137,7 +139,8 @@ public:
     
 private:
 	void sceneAnalyze () ; 
-	
+	void reorderUsers();
+    
 	int width, height ; 
     
     int minX, maxX, minY, maxY, minZ, maxZ;
@@ -152,6 +155,8 @@ private:
     std::map<int, ofxSceneUser *> tmpUsers ;
     std::map<int, ofxSceneUser *> newUsers ;
 	std::vector<standbyUser *> standbyUsers ;
+    
+    
     
     void printCorresp(){
         cout<<"corresp id : ";

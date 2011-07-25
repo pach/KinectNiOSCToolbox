@@ -31,6 +31,7 @@ void testApp::setup() {
     ofAddListener(playScene.retrieveUserEvent, this, &testApp::retrieveUser);
     ofAddListener(liveScene.lostUserEvent, this, &testApp::lostUser);
     ofAddListener(playScene.lostUserEvent, this, &testApp::lostUser);
+
 }
 
 void testApp::setupgui() {
@@ -208,9 +209,9 @@ void testApp::eventsgui(guiCallbackData & data){
         if(isSkeleton) {
             string path = "skeleton/" + skeletonPath->getValueText();
             if(isLive) {
-                liveUser.recordCalibrationData(path);
+//                liveUser.recordCalibrationData(path);
             }else {
-                playUser.recordCalibrationData(path);
+//                playUser.recordCalibrationData(path);
             }
         }
     }
@@ -232,8 +233,8 @@ void testApp::setupRecording(string _filename) {
 	liveDepth.setup(&liveContext);
 	liveImage.setup(&liveContext);
 	
-	liveUser.setup(&liveContext);
-	liveHandTracker.setup(&liveContext, 4);
+//	liveUser.setup(&liveContext);
+//	liveHandTracker.setup(&liveContext, 4);
     liveScene.setup(&liveContext, &liveDepth);
 	
 	liveContext.toggleRegisterViewport();
@@ -254,8 +255,8 @@ void testApp::setupPlayback(string _filename) {
 	playDepth.setup(&playContext);
 	playImage.setup(&playContext);
 	
-	playUser.setup(&playContext);
-    playHandTracker.setup(&playContext, 4);
+//	playUser.setup(&playContext);
+//  playHandTracker.setup(&playContext, 4);
     playScene.setup(&playContext, &playDepth);
 	
 	playContext.toggleRegisterViewport();
@@ -281,7 +282,7 @@ void testApp::update(){
             liveImage.update();
             
              // update tracking/recording nodes
-            if (isSkeleton) liveUser.update();
+//            if (isSkeleton) liveUser.update();
 
             if (isTracking)
                 liveScene.update();
@@ -297,7 +298,7 @@ void testApp::update(){
 		playImage.update();
 		
 		// update tracking/recording nodes
-		if (isSkeleton) playUser.update();
+//		if (isSkeleton) playUser.update();
         
         if (isTracking)
              playScene.update();
@@ -334,13 +335,14 @@ void testApp::draw(){
             liveImage.draw(640, 0, 640, 480);
             
 
-            if (isSkeleton) {
+/*            if (isSkeleton) {
                 liveUser.draw();
                 
             }
             if (isTrackingHands)
                 liveHandTracker.drawHands();
            
+*/            
             if (isTracking){
                 liveScene.drawUsers();
             }
@@ -351,13 +353,13 @@ void testApp::draw(){
 		playDepth.draw(0,0,640,480);
 		playImage.draw(640, 0, 640, 480);
 			
-		if (isSkeleton) {
+/*		if (isSkeleton) {
 			playUser.draw();
         
         }
 		if (isTrackingHands)
 			playHandTracker.drawHands();
-       
+*/       
         if (isTracking){
             playScene.drawUsers();
         }
@@ -372,8 +374,8 @@ void testApp::draw(){
 	string statusPlay		= (string)(isLive ? "LIVE STREAM" : "PLAY STREAM");
 	string statusRec		= (string)(!isRecording ? "READY" : "RECORDING");
     string statusTracking		= (string)(isTracking ? "TRACKING USERS : " + (string)(isLive ? ofToString((int)liveScene.getUsers().size()) : ofToString((int)playScene.getUsers().size())) + "" : "NOT TRACKING");
-	string statusSkeleton	= (string)(isSkeleton ? "SKELETON USERS: " + (string)(isLive ? ofToString(liveUser.getNumberOfTrackedUsers()) : ofToString(playUser.getNumberOfTrackedUsers())) + "" : "NOT SKELETON USERS");
-	string statusHands		= (string)(isTrackingHands ? "TRACKING HANDS: " + (string)(isLive ? ofToString(liveHandTracker.getNumTrackedHands()) : ofToString(playHandTracker.getNumTrackedHands())) + ""  : "NOT TRACKING");
+//	string statusSkeleton	= (string)(isSkeleton ? "SKELETON USERS: " + (string)(isLive ? ofToString(liveUser.getNumberOfTrackedUsers()) : ofToString(playUser.getNumberOfTrackedUsers())) + "" : "NOT SKELETON USERS");
+//	string statusHands		= (string)(isTrackingHands ? "TRACKING HANDS: " + (string)(isLive ? ofToString(liveHandTracker.getNumTrackedHands()) : ofToString(playHandTracker.getNumTrackedHands())) + ""  : "NOT TRACKING");
 	string statusHardware;
 
 #ifdef TARGET_OSX // only working on Mac at the moment
@@ -395,8 +397,8 @@ void testApp::draw(){
 	msg
 	<< "    playback/live streams : " << statusPlay << endl
     << "    users tracking     : " << statusTracking << endl
-	<< "    skeleton tracking     : " << statusSkeleton << endl
-	<< "    hand tracking         : " << statusHands << endl
+//	<< "    skeleton tracking     : " << statusSkeleton << endl
+//	<< "    hand tracking         : " << statusHands << endl
 	<< endl
 	<< "File  : " << oniRecorder.getCurrentFileName() << endl
 	<< "FPS   : " << ofToString(ofGetFrameRate()) << "  " << statusHardware << endl;
@@ -480,11 +482,11 @@ void testApp::sendUser() {
 void testApp::sendSkeleton (){
     if (isSendingOSC && isSkeleton){
         ofxUserGenerator * us ;
-        if (isLive)
+/*        if (isLive)
             us = &liveUser ;
         else 
             us = &playUser ;
-
+*/
         // pour chaque user trackŽ
         for (int i=0; i < us->getNumberOfTrackedUsers(); i++) {
             ofxTrackedUser *u = us->getTrackedUser(i);
@@ -512,7 +514,7 @@ void testApp::retrieveUser (int & idUser) {
 }
 
 void testApp::sendHands() {
-	vector<ofxTrackedHand*> hands ;
+/*	vector<ofxTrackedHand*> hands ;
     int nbHands ;
     if (isLive){
         hands = liveHandTracker.tracked_hands;
@@ -547,14 +549,17 @@ void testApp::sendHands() {
         it ++;
         num ++;
     }
+ */
 }
 
 
 void testApp::drawPointClouds(int x, int y){
     glPushMatrix();
 	
-    glTranslatef(x, y, 0);
+    glTranslatef(x, y, -500);
+    glTranslatef(320, 240, 0);
     glRotatef(cloudRotate, 0, 1, 0);
+    glTranslatef(-320, -240, 0);
     cloud.drawCloud();
     /*
 	int w = liveDepth.getWidth();

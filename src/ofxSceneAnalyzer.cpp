@@ -219,6 +219,68 @@ void ofxSceneAnalyzer::sceneAnalyze(){
 void ofxSceneAnalyzer::update(){
 	sceneAnalyze() ; 
     updateStandby() ;
+//    reorderUsers(); //completely buggy -> to debug before use
+}
+
+/* completely buggy */
+void ofxSceneAnalyzer::reorderUsers(){
+    if (ordering == 1){
+        //par taille de users
+        map<int, ofxSceneUser *>::iterator it = users.begin();
+        map<int, ofxSceneUser *>::iterator itEnd = users.end();
+        while (it != itEnd) {
+            it->second->idOrder = 1;        
+            it++;
+        }
+        
+        while (it != itEnd) {
+            map<int, ofxSceneUser *>::iterator itTri = users.begin();
+            int itSize = it->second->nbPoints;
+            while (itTri != itEnd) {
+                if (itTri != it){
+                    if (itTri->second->nbPoints < itSize)
+                        itTri->second->idOrder ++ ;
+                    else 
+                        it->second->idOrder ++ ;
+                }
+                itTri ++ ;
+            }
+            it++;
+        }
+    }
+    else if (ordering == 2){
+        // par position
+        map<int, ofxSceneUser *>::iterator it = users.begin();
+        map<int, ofxSceneUser *>::iterator itEnd = users.end();
+        while (it != itEnd) {
+            it->second->idOrder = 1;        
+            it++;
+        }
+        
+        while (it != itEnd) {
+            map<int, ofxSceneUser *>::iterator itTri = users.begin();
+            int itPos = it->second->centerZ;
+            while (itTri != itEnd) {
+                if (itTri != it){
+                    if (itTri->second->centerZ < itPos)
+                        itTri->second->idOrder ++ ;
+                    else 
+                        it->second->idOrder ++ ;
+                }
+                itTri ++ ;
+            }
+            it++;
+        }
+    }
+    else{
+        // par ordre d'apparition (pas de reorder)
+        map<int, ofxSceneUser *>::iterator it = users.begin();
+        map<int, ofxSceneUser *>::iterator itEnd = users.end();
+        while (it != itEnd) {
+            it->second->idOrder = it->second->idUser ;        
+            it++;
+        }
+    }
 }
 
 void ofxSceneAnalyzer::updateStandby(){

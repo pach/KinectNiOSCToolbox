@@ -32,6 +32,7 @@ public:
     
 	int idUserNi ;
     int idUser ;
+    int idOrder ; // some temporary added id to order by size or position
 	int xMin, yMin, zMin, xMax, yMax, zMax, centerX, centerY, centerZ, centerWorldX, centerWorldY, centerWorldZ ; 
     int tempX, tempY, tempZ ;
     float normX,normY, normZ;
