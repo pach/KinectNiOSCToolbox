@@ -67,7 +67,6 @@ void ofxSceneUser::drawUser(){
     ofSetColor (0, 255, 255) ; 
     ofDrawBitmapString(ofToString(idUser), centerX-2, centerY-2);
     
-    syphonText.setName("user"+ofToString(idOrder));
     syphonText.publishTexture(&mask);
 	
 }
