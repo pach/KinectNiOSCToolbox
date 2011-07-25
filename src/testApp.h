@@ -88,6 +88,9 @@ public:
     
     PointClouds cloud ;
     float cloudRotate ;
+    
+    ofxSyphonServer syphonImage;
+    ofxSyphonServer syphonDepth;
 
 };
 

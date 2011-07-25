@@ -23,11 +23,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "src/testApp.cpp"
-         timestampString = "333287431.98315"
+         timestampString = "333289570.957225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "544"
-         endingLineNumber = "544"
+         startingLineNumber = "552"
+         endingLineNumber = "552"
          landmarkName = "testApp::sendHands()"
          landmarkType = "5">
       </FileBreakpoint>
@@ -37,11 +37,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "0"
          filePath = "/Users/pach/Documents/OF/OF_0062/contributed_addons/ofxOpenNI_git/src/ofxImageGenerator.cpp"
-         timestampString = "329993016.489177"
+         timestampString = "333289570.957225"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "78"
-         endingLineNumber = "78"
+         startingLineNumber = "82"
+         endingLineNumber = "82"
          landmarkName = "ofxImageGenerator::getPixelAt(int x, int y)"
          landmarkType = "5">
       </FileBreakpoint>

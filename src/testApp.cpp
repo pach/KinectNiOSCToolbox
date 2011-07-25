@@ -31,7 +31,9 @@ void testApp::setup() {
     ofAddListener(playScene.retrieveUserEvent, this, &testApp::retrieveUser);
     ofAddListener(liveScene.lostUserEvent, this, &testApp::lostUser);
     ofAddListener(playScene.lostUserEvent, this, &testApp::lostUser);
-
+    
+    syphonImage.setName("kinectImage");
+    syphonDepth.setName("kinectDepth");
 }
 
 void testApp::setupgui() {
@@ -346,6 +348,9 @@ void testApp::draw(){
             if (isTracking){
                 liveScene.drawUsers();
             }
+            
+            syphonDepth.publishTexture(liveDepth.getTexture());
+            syphonImage.publishTexture(liveImage.getTexture());
         }
 		
 	} else {
@@ -363,6 +368,9 @@ void testApp::draw(){
         if (isTracking){
             playScene.drawUsers();
         }
+        
+        syphonDepth.publishTexture(playDepth.getTexture());
+        syphonImage.publishTexture(playImage.getTexture());
 	}
 	
 	glPopMatrix();
