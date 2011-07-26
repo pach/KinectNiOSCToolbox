@@ -2,11 +2,12 @@ This software want's to be an easy access to different possibility of kinect thr
 Actually it still need to have an xcode or equivalent installed on your mac to compile and install openNI driver.
 This software is made in OpenFrameworks and mostly based on gameoverhack ofxOpenNI port https://github.com/gameoverhack/ofxOpenNI
 
-Need to have openNI, kinect driver and NITE algorithm installed on your computer.
+Need to have openNI, kinect driver and NITE algorithm and syphon frameworks installed on your computer.
 This software as only been tested on mac platform
 OpenNI : https://github.com/OpenNI/OpenNI/tree/unstable
 driver : https://github.com/avin2/SensorKinect
 Nite : http://www.openni.org/downloadfiles/12-openni-compliant-middleware-binaries
+Syphon Frameworks
 
 Already done :
 - track multiple users into space and send their position in world coordinates threw OSC
@@ -14,18 +15,21 @@ Already done :
 	- normal : /user/data idUser posX posY posZ
 	- full user : /user/data idUser posX posY posZ xMin xMax yMin yMax zMin zMax
 	- separate data : 	/user/idUser/data/x posX
-						/user/idUser/data/x posY
-						/user/idUser/data/x posZ
+				/user/idUser/data/x posY
+				/user/idUser/data/x posZ
 - track hands
 	- still some bugs in OSC. Doesn't delete lost hands
 	
+ajout de SYPHON - syphon frameworks doit etre installé.
+
 todo :
 - track and send skeleton data
-- send mask of users threw syphon
 - correct lost hand bugs
 - add gesture recognition
 - camera virtuelle pour corriger les coordonnées reel de l'espace du kinect a celui d'une camera virtuelle.
 - normalisation des données
 - differentes gestion des id et donner envoyé (envoyer le plus proche...)
 - gestion des id sur mains
+
+- normalisation a check sur full user ?
 

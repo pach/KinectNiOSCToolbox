@@ -101,9 +101,9 @@ void OSCUserSender::sendFullUser (ofxSceneUser & user) {
     addr += ofToString(user.idUser);
 	m.setAddress(addr);
     //m.addIntArg(idUser);
-	m.addFloatArg(user.centerX/(float)user.width);
-	m.addFloatArg(user.centerY/(float)user.height);
-	m.addFloatArg(user.centerZ/5000.);
+	m.addFloatArg(user.normX/(float)user.width);
+	m.addFloatArg(user.normY/(float)user.height);
+	m.addFloatArg(user.normZ/5000.);
 	m.addFloatArg(user.xMin/(float)user.width);
 	m.addFloatArg(user.xMax/(float)user.width);
 	m.addFloatArg(user.yMin/(float)user.height);
